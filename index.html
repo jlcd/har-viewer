@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAR Reader</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #filters {
+            margin: 20px 0;
+        }
+        #filters label {
+            margin-right: 10px;
+        }
+        #urlSearch {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        #output {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .response-body {
+            width: 100px;
+            height: 30px;
+            resize: both;
+            overflow: auto;
+        }
+        .collapsible {
+            background-color: #777;
+            color: white;
+            cursor: pointer;
+            padding: 5px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 12px;
+        }
+        .active, .collapsible:hover {
+            background-color: #555;
+        }
+        .content {
+            padding: 0 5px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+            background-color: #f1f1f1;
+        }
+        .url-cell {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+        }
+        .copy-btn {
+            margin-left: 5px;
+            cursor: pointer;
+            color: #777;
+        }
+        .copy-btn:hover {
+            color: #555;
+        }
+        #copySelectedBtn, #generateGuzzleBtn {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        #copySelectedBtn:hover, #generateGuzzleBtn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>HAR Reader</h1>
+    <input type="file" id="fileInput" accept=".har">
+    <button onclick="processHAR()">Process HAR</button>
+    
+    <div id="filters">
+        <h3>Filter Requests:</h3>
+        <input type="text" id="urlSearch" placeholder="Search URLs...">
+        <label><input type="checkbox" name="filter" value="Fetch/XHR" checked> Fetch/XHR</label>
+        <label><input type="checkbox" name="filter" value="Doc" checked> Doc</label>
+        <label><input type="checkbox" name="filter" value="CSS"> CSS</label>
+        <label><input type="checkbox" name="filter" value="JS"> JS</label>
+        <label><input type="checkbox" name="filter" value="Font"> Font</label>
+        <label><input type="checkbox" name="filter" value="Img"> Img</label>
+        <label><input type="checkbox" name="filter" value="Media"> Media</label>
+        <label><input type="checkbox" name="filter" value="Manifest"> Manifest</label>
+        <label><input type="checkbox" name="filter" value="WS"> WS</label>
+        <label><input type="checkbox" name="filter" value="Wasm"> Wasm</label>
+        <label><input type="checkbox" name="filter" value="Other"> Other</label>
+    </div>
+    
+    <button id="copySelectedBtn" onclick="copySelectedRequests()">Copy Selected Requests</button>
+    <button id="generateGuzzleBtn" onclick="generateAndCopyGuzzleScript()">Generate PHP/Guzzle Script</button>
+
+    <h2>Processed Data:</h2>
+    <div id="output">
+        <table id="resultTable">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll" checked></th>
+                    <th>URL</th>
+                    <th>Method</th>
+                    <th>Type</th>
+                    <th>Sent Headers</th>
+                    <th>Response Headers</th>
+                    <th>Sent Data</th>
+                    <th>Received Data</th>
+                </tr>
+            </thead>
+            <tbody id="resultBody"></tbody>
+        </table>
+    </div>
+    <script src="guzzle-script-generator.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
