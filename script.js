@@ -49,20 +49,54 @@ function applyFilters() {
 
 function processEntries(entries, filters, urlSearchTerm) {
     return entries
-        .map(entry => ({
-            url: entry.request.url,
-            method: entry.request.method,
-            type: getRequestType(entry),
-            statusCode: entry.response.status,
-            sentHeaders: convertHeaders(entry.request.headers),
-            responseHeaders: convertHeaders(entry.response.headers),
-            sentData: entry.request.postData ? entry.request.postData.text : null,
-            receivedData: entry.response.content.text || null
-        }))
+        .map(entry => {
+            const sentHeaders = convertHeaders(entry.request.headers);
+            const responseHeaders = convertHeaders(entry.response.headers);
+            const cookies = extractCookies(entry.request.headers, entry.response.headers);
+            
+            if (Object.keys(cookies).length > 0) {
+                sentHeaders['Cookie'] = Object.entries(cookies)
+                    .map(([name, value]) => `${name}=${value}`)
+                    .join('; ');
+            }
+
+            return {
+                url: entry.request.url,
+                method: entry.request.method,
+                type: getRequestType(entry),
+                statusCode: entry.response.status,
+                sentHeaders: sentHeaders,
+                responseHeaders: responseHeaders,
+                sentData: entry.request.postData ? entry.request.postData.text : null,
+                receivedData: entry.response.content.text || null
+            };
+        })
         .filter(entry => 
             filters.includes(entry.type) && 
             entry.url.toLowerCase().includes(urlSearchTerm)
         );
+}
+
+function extractCookies(requestHeaders, responseHeaders) {
+    const cookies = {};
+    
+    // Extract cookies from request headers
+    const requestCookie = requestHeaders.find(header => header.name.toLowerCase() === 'cookie');
+    if (requestCookie) {
+        requestCookie.value.split(';').forEach(cookie => {
+            const [name, value] = cookie.trim().split('=');
+            cookies[name] = value;
+        });
+    }
+    
+    // Extract cookies from response headers
+    responseHeaders.filter(header => header.name.toLowerCase() === 'set-cookie').forEach(header => {
+        const [cookieString] = header.value.split(';');
+        const [name, value] = cookieString.trim().split('=');
+        cookies[name] = value;
+    });
+    
+    return cookies;
 }
 
 function populateTable(data) {

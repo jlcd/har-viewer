@@ -31,6 +31,11 @@ $requests = [];
 `;
 
     selectedData.forEach((entry, index) => {
+        // Ensure cookies are included in the headers
+        if (entry.sentHeaders['Cookie']) {
+            entry.sentHeaders['Cookie'] = escapePhpString(entry.sentHeaders['Cookie']);
+        }
+
         const headers = objectToPHPArray(entry.sentHeaders, '    ');
         const body = entry.sentData ? escapePhpString(JSON.stringify(entry.sentData, null, 2)) : 'null';
 
