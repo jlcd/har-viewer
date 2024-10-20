@@ -53,6 +53,7 @@ function processEntries(entries, filters, urlSearchTerm) {
             url: entry.request.url,
             method: entry.request.method,
             type: getRequestType(entry),
+            statusCode: entry.response.status,
             sentHeaders: convertHeaders(entry.request.headers),
             responseHeaders: convertHeaders(entry.response.headers),
             sentData: entry.request.postData ? entry.request.postData.text : null,
@@ -79,6 +80,7 @@ function populateTable(data) {
             </td>
             <td>${sanitizeHtml(entry.method)}</td>
             <td>${sanitizeHtml(entry.type)}</td>
+            <td>${sanitizeHtml(entry.statusCode)}</td>
             <td>${createCollapsibleContent('Sent Headers', entry.sentHeaders)}</td>
             <td>${createCollapsibleContent('Response Headers', entry.responseHeaders)}</td>
             <td>${createCollapsibleContent('Sent Data', entry.sentData)}</td>
@@ -183,6 +185,7 @@ function copySelectedRequests() {
         return {
             url: entry.url,
             method: entry.method,
+            statusCode: entry.statusCode,
             sentHeaders: entry.sentHeaders,
             responseHeaders: entry.responseHeaders,
             sentData: parseSentData(entry.sentData),
